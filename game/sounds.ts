@@ -6,6 +6,11 @@ type SoundName = "step" | "bump" | "chime";
 const SOUND_FOR: Record<GameEvent["type"], SoundName | null> = {
   moved: "step",
   blocked: "bump",
+  gathered: "chime",
+  gather_failed: "bump",
+  crafted: "chime",
+  craft_failed: "bump",
+  won: "chime",
 };
 
 type Note = {
