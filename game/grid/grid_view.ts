@@ -13,10 +13,10 @@ const MARKER_COLOR = 0xf5e6a8;
 const BUMP_COLOR = 0xe0533d;
 
 const TERRAIN_COLORS: Record<Terrain, number> = {
-  grass: 0x5d9e4a,
-  forest: 0x2f6b3a,
-  water: 0x2d5f9e,
-  rock: 0x6e6a66,
+  shore: 0x5d9e4a,
+  grove: 0x2f6b3a,
+  channel: 0x2d5f9e,
+  cliff: 0x6e6a66,
 };
 
 // Enough cells to cover the view, plus a margin so that the camera can lag behind
@@ -82,6 +82,12 @@ export class GridView extends Phaser.Scene {
         return this.walk(event.to);
       case "blocked":
         return this.bump(event.at, event.toward);
+      case "gathered":
+      case "gather_failed":
+      case "crafted":
+      case "craft_failed":
+      case "won":
+        return Promise.resolve();
       default:
         // A new event type fails to type-check here until it has a presentation.
         event satisfies never;

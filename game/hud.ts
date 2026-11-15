@@ -10,6 +10,16 @@ function describe(event: GameEvent): string {
       return `moved to ${event.to.x}, ${event.to.y}`;
     case "blocked":
       return `blocked by ${event.terrain} at ${event.toward.x}, ${event.toward.y}`;
+    case "gathered":
+      return `collected ${event.item}`;
+    case "gather_failed":
+      return `gather failed: ${event.reason}`;
+    case "crafted":
+      return `crafted ${event.item}`;
+    case "craft_failed":
+      return `craft failed: ${event.reason}`;
+    case "won":
+      return event.message;
   }
 }
 
