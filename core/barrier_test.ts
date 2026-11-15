@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import { apply, newGame, terrainAt, TERRAIN_DATA } from "./mod.ts";
+import { apply, newGame, TERRAIN_DATA, terrainAt } from "./mod.ts";
 import type { Terrain } from "./terrain.ts";
 
 // Find land directly west of a target barrier, so a move tests the actual rule.
@@ -21,10 +21,12 @@ function atBarrier(kind: Terrain) {
   throw new Error(`Cannot find land near ${kind}`);
 }
 
-for (const [terrain, recipe, materials] of [
-  ["channel", "raft", { scrap: 1, rope: 1 }],
-  ["cliff", "climbing_kit", { scrap: 1, copper: 1 }],
-] as const) {
+for (
+  const [terrain, recipe, materials] of [
+    ["channel", "raft", { scrap: 1, rope: 1 }],
+    ["cliff", "climbing_kit", { scrap: 1, copper: 1 }],
+  ] as const
+) {
   Deno.test(`${terrain} is closed until ${recipe} is crafted`, () => {
     const state = atBarrier(terrain);
     const blocked = apply(state, { type: "move", direction: "east" });

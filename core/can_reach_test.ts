@@ -1,6 +1,6 @@
 import { assertEquals } from "@std/assert";
 import { unreachableRecipes } from "./can_reach.ts";
-import { RECIPES, type Recipe } from "./recipes.ts";
+import { type Recipe, RECIPES } from "./recipes.ts";
 
 Deno.test("Each real recipe is eventually reachable", () => {
   assertEquals(unreachableRecipes(RECIPES), []);

@@ -9,14 +9,16 @@ Deno.test("making the rescue beacon wins and freezes every command", () => {
   assertEquals(events.map((event) => event.type), ["crafted", "won"]);
   assertEquals(state.won, true);
   const snapshot = JSON.parse(JSON.stringify(state));
-  for (const command of [
-    { type: "move", direction: "north" },
-    { type: "move", direction: "south" },
-    { type: "move", direction: "east" },
-    { type: "move", direction: "west" },
-    { type: "gather" },
-    { type: "craft", recipe: "rope" },
-  ] as const) {
+  for (
+    const command of [
+      { type: "move", direction: "north" },
+      { type: "move", direction: "south" },
+      { type: "move", direction: "east" },
+      { type: "move", direction: "west" },
+      { type: "gather" },
+      { type: "craft", recipe: "rope" },
+    ] as const
+  ) {
     assertEquals(apply(state, command), []);
     assertEquals(state, snapshot);
   }
