@@ -31,15 +31,55 @@ export class Hud {
   constructor(state: GameState) {
     this.seed = state.seed;
     this.showPosition(state.player.x, state.player.y);
+
+    this.showInventory(state.inventory);
   }
 
   show(event: GameEvent) {
     element("live").textContent = describe(event);
-    if (event.type === "moved") this.showPosition(event.to.x, event.to.y);
+    if (event.type === "moved") {
+      this.showPosition(event.to.x, event.to.y);
+    }
+  
+    // Update inventory after gathering or crafting
+    if (event.type === "gathered" || event.type === "crafted") {
+      this.showInventory(event.inventory);
+    }
+  
+    // Display victory message
+    if (event.type === "won") {
+      const victory = element("victory");
+      victory.textContent = event.message;
+      victory.hidden = false;
+    }
   }
 
   private showPosition(x: number, y: number) {
     element("position").textContent = `${x}, ${y}`;
     element("terrain").textContent = terrainAt(this.seed, x, y);
   }
+
+  private showInventory(inventory: Record<string, number>) {
+    const inventoryElement = element("inventory");
+    inventoryElement.replaceChildren();
+  
+    const items = Object.entries(inventory)
+      .filter(([, quantity]) => quantity > 0);
+  
+    if (items.length === 0) {
+      inventoryElement.textContent = "No resources collected yet.";
+      return;
+    }
+  
+    const list = document.createElement("ul");
+  
+    for (const [item, quantity] of items) {
+      const entry = document.createElement("li");
+      entry.textContent = `${item}: ${quantity}`;
+      list.append(entry);
+    }
+  
+    inventoryElement.append(list);
+  }
 }
+
