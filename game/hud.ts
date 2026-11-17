@@ -40,12 +40,12 @@ export class Hud {
     if (event.type === "moved") {
       this.showPosition(event.to.x, event.to.y);
     }
-  
+
     // Update inventory after gathering or crafting
     if (event.type === "gathered" || event.type === "crafted") {
       this.showInventory(event.inventory);
     }
-  
+
     // Display victory message
     if (event.type === "won") {
       const victory = element("victory");
@@ -62,24 +62,23 @@ export class Hud {
   private showInventory(inventory: Record<string, number>) {
     const inventoryElement = element("inventory");
     inventoryElement.replaceChildren();
-  
+
     const items = Object.entries(inventory)
       .filter(([, quantity]) => quantity > 0);
-  
+
     if (items.length === 0) {
       inventoryElement.textContent = "No resources collected yet.";
       return;
     }
-  
+
     const list = document.createElement("ul");
-  
+
     for (const [item, quantity] of items) {
       const entry = document.createElement("li");
       entry.textContent = `${item}: ${quantity}`;
       list.append(entry);
     }
-  
+
     inventoryElement.append(list);
   }
 }
-

@@ -21,3 +21,26 @@ For a person, or an agent driving a browser. Run `deno task dev` and open the lo
 | 13 | Tab to the sound button and press Space                   | It toggles. Arrow keys still move the marker.                                                                                                               |
 | 14 | Listen while walking and bumping (headphones or speakers) | A soft tick on each step, and a low buzz on each bump. **This is the only check that a person can hear them.**                                              |
 | 15 | On a high-resolution display, or at browser zoom 200%     | Grid edges stay sharp. The marker stays centered. Run `document.querySelector("canvas").width`: it is the canvas `clientWidth` times `devicePixelRatio`.    |
+
+Full gameplay test
+
+1. Run deno task dev.
+
+2. Open the game using a fixed seed, such as ?seed=121.
+
+3. Move around and gather resources.
+
+4. Try gathering from the same cell twice. The second attempt should not\
+   add another item.
+
+5. Open the inventory and verify that gathered items appear.
+
+6. Attempt to craft an item without enough materials. Verify that the game explains the failure and inventory does not change.
+
+7. Gather the required materials and craft a rope and raft.
+
+8. Move to a channel cell and verify that it is accessible after crafting the raft.
+
+9. Gather the materials for the remaining recipes and craft the rescue beacon.
+
+10. Verify that the win state appears and that further commands do not change the game.
