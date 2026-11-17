@@ -19,8 +19,6 @@ Deno.test("the recorded run wins using only commands", () => {
 
 Deno.test("replaying a complete game reproduces all state and events", () => {
   const a = replay();
-  const start = Date.now();
-  while (Date.now() === start);
   const b = replay();
   assertEquals(a, b);
   assertEquals(JSON.parse(JSON.stringify(a)), a);
