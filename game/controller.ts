@@ -1,4 +1,4 @@
-import { apply, type Command, type Direction } from "../core/mod.ts";
+import { apply, type Command, type Direction, RECIPES } from "../core/mod.ts";
 import type { GameState } from "../core/mod.ts";
 import type { Presenter } from "./presenter.ts";
 
@@ -22,6 +22,9 @@ export class Controller {
   // to read the core here. During playback, the core is ahead of what the player
   // has seen, and reading it would show the future.
   onSettled: () => void = () => {};
+  // Every command that changed something, in order. Paste the output of
+  // game.controller.exportRun() into core/run.json to record a playthrough.
+  readonly history: Command[] = [];
 
   constructor(state: GameState, presenter: Presenter) {
     this.state = state;
@@ -48,6 +51,15 @@ export class Controller {
       this.next();
       return;
     }
+
+    // Number keys craft the recipe shown with that number in the recipe book.
+    const recipe = RECIPES[Number(event.key) - 1];
+    if (/^[1-9]$/.test(event.key) && recipe) {
+      event.preventDefault();
+      if (event.repeat) return;
+      this.craft(recipe.id);
+      return;
+    }
     const direction = ARROWS[event.key];
     if (!direction) return;
 
@@ -57,6 +69,20 @@ export class Controller {
     this.held.push(direction);
     this.pressed = { type: "move", direction };
     this.next();
+  }
+
+  // For the recipe book's buttons. Waits like a key tap if a walk is playing.
+  craft(recipe: string) {
+    this.pressed = { type: "craft", recipe };
+    this.next();
+  }
+
+  exportRun(): string {
+    return JSON.stringify(
+      { seed: this.state.seed, commands: this.history },
+      null,
+      2,
+    );
   }
 
   private keyUp(event: KeyboardEvent) {
@@ -79,6 +105,9 @@ export class Controller {
     // Playing nothing would report idle at once, and a held key would land back
     // here until the stack overflowed. No events means there is nothing to wait for.
     const events = apply(this.state, command);
-    if (events.length > 0) this.presenter.play(events);
+    if (events.length > 0) {
+      this.history.push(command);
+      this.presenter.play(events);
+    }
   }
 }
