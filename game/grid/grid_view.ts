@@ -11,6 +11,10 @@ const WALK_MS = 120;
 const BUMP_MS = 60;
 const MARKER_COLOR = 0xf5e6a8;
 const BUMP_COLOR = 0xe0533d;
+const GATHER_COLOR = 0x9be37a;
+const CRAFT_COLOR = 0xffc94a;
+const HARVESTED_COLOR = 0x14161a;
+const PULSE_MS = 140;
 
 const TERRAIN_COLORS: Record<Terrain, number> = {
   shore: 0x5d9e4a,
@@ -38,11 +42,16 @@ export class GridView extends Phaser.Scene {
   private readonly start: Cell;
   private ground!: Phaser.GameObjects.Graphics;
   private marker!: Phaser.GameObjects.Arc;
+  // Cells this view has shown being gathered. Built from events, not read from
+  // the core, so a harvested mark never appears before its gather plays.
+  private readonly harvested = new Set<string>();
+  private center: Cell;
 
   constructor(state: GameState) {
     super("grid");
     this.seed = state.seed;
     this.start = { ...state.player };
+    this.center = { ...state.player };
   }
 
   create() {
@@ -83,11 +92,16 @@ export class GridView extends Phaser.Scene {
       case "blocked":
         return this.bump(event.at, event.toward);
       case "gathered":
+        this.harvested.add(`${event.at.x},${event.at.y}`);
+        this.drawCellsAround(this.center);
+        return this.pulse(GATHER_COLOR, 1.35, event.at);
       case "gather_failed":
-      case "crafted":
       case "craft_failed":
+        return this.shake();
+      case "crafted":
+        return this.pulse(CRAFT_COLOR, 1.6);
       case "won":
-        return Promise.resolve();
+        return this.celebrate();
       default:
         // A new event type fails to type-check here until it has a presentation.
         event satisfies never;
@@ -126,9 +140,67 @@ export class GridView extends Phaser.Scene {
     });
   }
 
+  // Swell and flash, then settle back. A gather also drops a spark from the cell.
+  private pulse(color: number, scale: number, from?: Cell): Promise<void> {
+    this.marker.setFillStyle(color);
+    if (from) {
+      const { x, y } = cellCenter(from);
+      const spark = this.add.circle(x, y, CELL_SIZE * 0.18, color);
+      this.tweens.add({
+        targets: spark,
+        y: y - CELL_SIZE,
+        alpha: 0,
+        duration: PULSE_MS * 3,
+        onComplete: () => spark.destroy(),
+      });
+    }
+    return new Promise((done) => {
+      this.tweens.add({
+        targets: this.marker,
+        scale,
+        duration: PULSE_MS,
+        yoyo: true,
+        onComplete: () => {
+          this.marker.setFillStyle(MARKER_COLOR);
+          done();
+        },
+      });
+    });
+  }
+
+  
+  private celebrate(): Promise<void> {
+    this.marker.setFillStyle(CRAFT_COLOR);
+    const rings = [0, 1, 2].map((index) =>
+      new Promise<void>((done) => {
+        const ring = this.add.circle(
+          this.marker.x,
+          this.marker.y,
+          CELL_SIZE / 2,
+        )
+          .setStrokeStyle(3, CRAFT_COLOR)
+          .setFillStyle();
+        this.tweens.add({
+          targets: ring,
+          scale: 8,
+          alpha: 0,
+          delay: index * 300,
+          duration: 1200,
+          onComplete: () => {
+            ring.destroy();
+            done();
+          },
+        });
+      })
+    );
+    return Promise.all(rings).then(() => {});
+  }
+
   // Paint only what is near the camera. Asking the core again costs little, and
   // the world itself is never stored.
-  private drawCellsAround({ x: centerX, y: centerY }: Cell) {
+  private drawCellsAround(center: Cell) {
+    this.center = { ...center };
+    const { x: centerX, y: centerY } = center;
     this.ground.clear();
     for (let y = centerY - CELLS_DOWN; y <= centerY + CELLS_DOWN; y++) {
       for (let x = centerX - CELLS_ACROSS; x <= centerX + CELLS_ACROSS; x++) {
@@ -139,6 +211,15 @@ export class GridView extends Phaser.Scene {
           CELL_SIZE - 1,
           CELL_SIZE - 1,
         );
+        if (this.harvested.has(`${x},${y}`)) {
+          // A small dark notch: this cell has been picked clean.
+          this.ground.fillStyle(HARVESTED_COLOR, 0.55);
+          this.ground.fillCircle(
+            x * CELL_SIZE + CELL_SIZE / 2,
+            y * CELL_SIZE + CELL_SIZE / 2,
+            CELL_SIZE * 0.16,
+          );
+        }
       }
     }
   }
