@@ -1,4 +1,4 @@
-/* The page around the grid. Everything here is yours to restyle. */
+/* The page around the grid: a dark, salt-stained field kit. */
 body {
   margin: 0;
   background: #14161a;
@@ -19,8 +19,8 @@ body {
 }
 
 #hud {
-  flex: 1 1 200px;
-  max-width: 320px;
+  flex: 1 1 240px;
+  max-width: 340px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -80,4 +80,229 @@ body {
     transparent 55%,
     rgb(0 0 0 / 0.5) 100%
   );
+}
+
+/* Title bar */
+#title {
+  padding: 16px 16px 0;
+}
+
+#title h1 {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  color: #ffc94a;
+}
+
+#title p {
+  margin: 4px 0 0;
+  color: #8d8a82;
+}
+
+#hud h2 {
+  margin: 0 0 6px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #8d8a82;
+}
+
+#hud section {
+  padding: 10px 12px;
+  background: #1c1f24;
+  border: 1px solid #2c3038;
+  border-radius: 6px;
+}
+
+#objective {
+  margin: 0 0 6px;
+}
+
+#objective strong {
+  color: #ffc94a;
+}
+
+#hints {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: #b7b3a8;
+}
+
+.swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 2px;
+  vertical-align: -1px;
+}
+
+.swatch.shore {
+  background: #5d9e4a;
+}
+.swatch.grove {
+  background: #2f6b3a;
+}
+.swatch.channel {
+  background: #2d5f9e;
+}
+.swatch.cliff {
+  background: #6e6a66;
+}
+
+#inventory ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+#inventory li {
+  padding: 2px 8px;
+  background: #262a31;
+  border-radius: 10px;
+  text-transform: capitalize;
+}
+
+/* Recipe book */
+.recipes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.recipe {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 6px 8px;
+  color: #8d8a82;
+  text-align: left;
+  font: inherit;
+  background: #23272e;
+  border: 1px solid #333842;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.recipe .name {
+  text-transform: capitalize;
+  font-weight: 600;
+}
+
+.recipe .inputs {
+  font-size: 12px;
+}
+
+.recipe.ready {
+  color: #e8e4da;
+  border-color: #5d9e4a;
+  background: #26332a;
+}
+
+.recipe.final {
+  border-style: dashed;
+}
+
+.recipe.final.ready {
+  border-color: #ffc94a;
+  background: #3a3220;
+}
+
+.recipe:hover:not(:disabled) {
+  border-color: #8d8a82;
+}
+
+.recipe:focus-visible,
+#mute:focus-visible {
+  outline: 2px solid #ffc94a;
+  outline-offset: 1px;
+}
+
+.recipe:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+#controls {
+  margin: 0;
+  font-size: 12px;
+  color: #8d8a82;
+}
+
+kbd {
+  padding: 0 4px;
+  font-family: monospace;
+  background: #262a31;
+  border: 1px solid #3a3f48;
+  border-radius: 3px;
+}
+
+/* Victory banner */
+#victory {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgb(10 12 16 / 0.7);
+  animation: fade-in 0.6s ease-out;
+}
+
+#victory[hidden] {
+  display: none;
+}
+
+#victory .card {
+  padding: 24px 32px;
+  text-align: center;
+  background: #1c1f24;
+  border: 2px solid #ffc94a;
+  border-radius: 10px;
+  box-shadow: 0 0 40px rgb(255 201 74 / 0.35);
+  animation: pop 0.5s ease-out;
+}
+
+#victory h2 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  color: #ffc94a;
+}
+
+#victory p {
+  margin: 4px 0;
+}
+
+#victory .small {
+  font-size: 12px;
+  color: #8d8a82;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #victory,
+  #victory .card {
+    animation: none;
+  }
 }
