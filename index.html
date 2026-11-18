@@ -3,34 +3,77 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>D3 project</title>
+    <title>Flooded Signal</title>
     <link rel="icon" href="data:," />
     <link rel="stylesheet" href="/game/style.css" />
   </head>
   <body>
+    <header id="title">
+      <h1>Flooded Signal</h1>
+      <p>
+        Stranded on a flooded coast. Salvage parts, build gear, and get a
+        rescue beacon transmitting.
+      </p>
+    </header>
     <main id="app">
       <div id="grid"></div>
       <aside id="hud">
+        <section id="objective-panel">
+          <h2>Objective</h2>
+          <p id="objective">
+            Craft the <strong>rescue beacon</strong> to signal for help.
+          </p>
+          <ul id="hints">
+            <li><span class="swatch shore"></span>Shore gives scrap</li>
+            <li><span class="swatch grove"></span>Grove gives fiber</li>
+            <li>
+              <span class="swatch channel"></span>Channel gives copper (needs a
+              raft)
+            </li>
+            <li>
+              <span class="swatch cliff"></span>Cliff gives crystal (needs a
+              climbing kit)
+            </li>
+          </ul>
+        </section>
+
         <dl>
           <dt>Position</dt>
           <dd id="position"></dd>
           <dt>Terrain</dt>
+          <dd id="terrain"></dd>
         </dl>
-        <!-- Inventory -->
-        <h2>Inventory</h2>
-        <div id="inventory" aria-live="polite">
-          No resources collected yet.
-        </div>
 
-        <!-- Game objective -->
-        <h2>Objective</h2>
-        <p id="objective">
-           Explore, collect resources, and craft items.
-        </p>
+        <section>
+          <h2>Inventory</h2>
+          <div id="inventory" aria-live="polite">
+            No resources collected yet.
+          </div>
+        </section>
+
+        <section>
+          <h2>Recipes</h2>
+          <div id="recipes"></div>
+        </section>
+
         <p id="live" aria-live="polite"></p>
+
+        <p id="controls">
+          <kbd>←↑↓→</kbd> move · <kbd>G</kbd> gather · <kbd>1</kbd>–<kbd>6</kbd>
+          craft
+        </p>
         <button id="mute" type="button" aria-pressed="false">Sound: on</button>
       </aside>
     </main>
+
+    <div id="victory" role="alert" hidden>
+      <div class="card">
+        <h2>Rescued!</h2>
+        <p id="victory-message"></p>
+        <p class="small">Reload the page to play again, or try ?seed=7.</p>
+      </div>
+    </div>
+
     <script type="module" src="/game/main.ts"></script>
   </body>
 </html>
