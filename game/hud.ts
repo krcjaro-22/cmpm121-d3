@@ -1,7 +1,17 @@
-import { type GameEvent, type GameState, terrainAt } from "../core/mod.ts";
+import {
+  type GameEvent,
+  type GameState,
+  type Terrain,
+  TERRAIN_DATA,
+  terrainAt,
+} from "../core/mod.ts";
 
 function element(id: string): HTMLElement {
   return document.getElementById(id)!;
+}
+
+function label(item: string): string {
+  return item.replaceAll("_", " ");
 }
 
 function describe(event: GameEvent): string {
@@ -9,18 +19,35 @@ function describe(event: GameEvent): string {
     case "moved":
       return `moved to ${event.to.x}, ${event.to.y}`;
     case "blocked":
-      return `blocked by ${event.terrain} at ${event.toward.x}, ${event.toward.y}`;
+      return blockedText(event.terrain, event.toward);
     case "gathered":
-      return `collected ${event.item}`;
+      return `collected ${label(event.item)}`;
     case "gather_failed":
-      return `gather failed: ${event.reason}`;
+      return `nothing to gather here: ${event.reason}`;
     case "crafted":
-      return `crafted ${event.item}`;
-    case "craft_failed":
-      return `craft failed: ${event.reason}`;
+      return `crafted ${label(event.item)}`;
+    case "craft_failed": {
+      const missing = Object.entries(event.missing)
+        .map(([item, amount]) => `${amount} ${label(item)}`)
+        .join(", ");
+      return `can't craft ${label(event.recipe)}: ${
+        missing ? `need ${missing}` : event.reason
+      }`;
+    }
     case "won":
       return event.message;
   }
+}
+
+function blockedText(
+  terrain: Terrain,
+  toward: { x: number; y: number },
+): string {
+  const needs = TERRAIN_DATA[terrain].requires;
+  const at = `${toward.x}, ${toward.y}`;
+  return needs
+    ? `blocked by ${terrain} at ${at}: craft a ${label(needs)} to enter`
+    : `blocked by ${terrain} at ${at}`;
 }
 
 // The readout, as ordinary page elements that CSS can style and that assistive
@@ -49,7 +76,7 @@ export class Hud {
     // Display victory message
     if (event.type === "won") {
       const victory = element("victory");
-      victory.textContent = event.message;
+      element("victory-message").textContent = event.message;
       victory.hidden = false;
     }
   }
@@ -75,7 +102,7 @@ export class Hud {
 
     for (const [item, quantity] of items) {
       const entry = document.createElement("li");
-      entry.textContent = `${item}: ${quantity}`;
+      entry.textContent = `${label(item)}: ${quantity}`;
       list.append(entry);
     }
 
